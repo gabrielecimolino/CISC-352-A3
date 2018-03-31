@@ -31,6 +31,7 @@ windSpeed = None
 windHeading = None
 obstacleNumber = int(min(WIDTH, HEIGHT) / 100)
 dogfight = False
+red = False
 
 centroidX = 0
 centroidY = 0
@@ -51,7 +52,10 @@ def toggleWind():
 
 def toggleDogfight():
     global dogfight
+    global applyWind
     if(not(dogfight)):
+        if(applyWind):
+            toggleWind()
         if(len(obstacles) == 0):
             createObstacles()
 
@@ -97,6 +101,12 @@ def build_graph():
     obstacleButton = Button(frame, text="Dogfight", command=toggleDogfight)
     obstacleButton.pack(side=LEFT)
 
+    deployRed = Button(frame, text="Deploy", command=createRedBoid, background='red')
+    deployRed.pack(side=LEFT)
+
+    deployBlue = Button(frame, text="Deploy", command=createBlueBoid, background='blue')
+    deployBlue.pack(side=LEFT)
+
     graph = Canvas(root, width=WIDTH, height=HEIGHT, background='white')
     graph.after(40, update)
     graph.pack()
@@ -110,6 +120,36 @@ def createBoids():
     for i in range(boidNumber):
         boid = Boid(random.randint(0, WIDTH), random.randint(0, HEIGHT), boidSpeed, (i > boidNumber / 2))
         boids.append(boid)
+
+def createBoid():
+    global WIDTH
+    global HEIGHT
+    global boidSpeed
+    global boids
+    global red
+
+    red = not(red)
+
+    boid = Boid(random.randint(0, WIDTH), random.randint(0, HEIGHT), boidSpeed, red)
+    boids.append(boid)
+
+def createRedBoid():
+    global WIDTH
+    global HEIGHT
+    global boidSpeed
+    global boids
+
+    boid = Boid(random.randint(0, WIDTH), random.randint(0, HEIGHT), boidSpeed, True)
+    boids.append(boid)
+
+def createBlueBoid():
+    global WIDTH
+    global HEIGHT
+    global boidSpeed
+    global boids
+
+    boid = Boid(random.randint(0, WIDTH), random.randint(0, HEIGHT), boidSpeed, False)
+    boids.append(boid)
 
 def createObstacles():
     global WIDTH
