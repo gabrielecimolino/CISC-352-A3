@@ -5,8 +5,8 @@ import random
 graph = None
 frameGap = 0
 
-WIDTH = 1500
-HEIGHT = 800
+WIDTH = 1600
+HEIGHT = 900
 
 boidSize = 5
 obstacleSize = 20
@@ -44,7 +44,6 @@ def main():
 def initialise():
     build_graph()
     createBoids()
-    #createObstacles()
 
 def toggleWind():
     global applyWind
@@ -159,33 +158,6 @@ def createObstacles():
     global obstacles
     global obstacleNumber
 
-    # posX = 0
-
-    # while(posX < WIDTH):
-    #     obstacle = Boid(posX, 0, boidSpeed)
-    #     obstacles.append(obstacle)
-    #     posX += separationDistance
-
-    # posX = 0
-
-    # while(posX < WIDTH):
-    #     obstacle = Boid(posX, HEIGHT, boidSpeed)
-    #     obstacles.append(obstacle)
-    #     posX += separationDistance
-
-    # posY = 0
-
-    # while(posY < HEIGHT):
-    #     obstacle = Boid(0, posY, boidSpeed)
-    #     obstacles.append(obstacle)
-    #     posY += separationDistance
-
-    # posY = 0
-
-    # while(posY < HEIGHT):
-    #     obstacle = Boid(WIDTH, posY, boidSpeed)
-    #     obstacles.append(obstacle)
-    #     posY += separationDistance
     if(len(obstacles) == 0):
         for i in range(obstacleNumber):
             obstacle = Boid(random.randint(0, WIDTH), random.randint(0, HEIGHT), boidSpeed, False)
@@ -206,8 +178,6 @@ def wind(velocities):
     h = windHeading.get()
     h = h / 57.2958
 
-    #graph.create_line(WIDTH / 2, HEIGHT / 2, WIDTH / 2 + s * math.sin(h), HEIGHT / 2 + s * math.cos(h))
-
     for i in range(len(velocities)):
         velocities[i][0] += s * math.sin(h)
         velocities[i][1] += s * math.cos(h)
@@ -221,22 +191,20 @@ def move():
 
     velocities = []
 
-    #print("Moving boids")
     cohesionVelocities = cohesion()
     separationVelocities = separation()
-
-    for i in range(len(boids)):
-        velocities.append([cohesionVelocities[i][0] + separationVelocities[i][0], cohesionVelocities[i][1] + separationVelocities[i][1]])
-
     alignedVelocities = alignment()
     boundVelocities = bound()
+
+    for i in range(len(boids)):
+        velocities.append([cohesionVelocities[i][0] + separationVelocities[i][0] + alignedVelocities[i][0] + boundVelocities[i][0], cohesionVelocities[i][1] + separationVelocities[i][1]  + alignedVelocities[i][1] + boundVelocities[i][1]])
 
     if(applyWind):
         velocities = wind(velocities)
 
     for i in range(len(boids)):
-        vX = velocities[i][0] + alignedVelocities[i][0] + boundVelocities[i][0]
-        vY = velocities[i][1] + alignedVelocities[i][1] + boundVelocities[i][1]
+        vX = velocities[i][0]
+        vY = velocities[i][1]
         magnitude = mag(vX, vY)
         if(magnitude > 0):
             vX = vX / magnitude
@@ -423,14 +391,9 @@ def cohesion():
             difX = (pX / neighbours) - boid.posX
             difY = (pY / neighbours) - boid.posY
             difMagnitude = math.sqrt(math.pow(difX, 2) + math.pow(difY, 2))
-            # if(difMagnitude != 0):
-            #     difX = difX / difMagnitude
-            #     difY = difY / difMagnitude
 
         velocities.append([difX, difY])
 
-    # print("\nCohesion")
-    # print(velocities)
 
     return velocities
 
@@ -458,8 +421,8 @@ def separation():
             difMagnitude = mag(difX, difY)
 
             if(difMagnitude < separationDistance and difMagnitude != 0):
-                vX -= difX#(difX / difMagnitude)# * (separationDistance - difMagnitude)
-                vY -= difY#(difY / difMagnitude)# * (separationDistance - difMagnitude)
+                vX -= difX
+                vY -= difY
 
         for obstacle in obstacles:
             difX = obstacle.posX - boid.posX
@@ -470,44 +433,11 @@ def separation():
                 vX -= difX * math.pow((obstacleDistance - difMagnitude), 2)
                 vY -= difY * math.pow((obstacleDistance - difMagnitude), 2)
 
-        # if(touching > 0):
-        #     vX = vX / touching
-        #     vY = vY / touching
-
-        # if(touching > 0):
-        #     magnitude = mag(vX, vY)
-        # else:
-        #     magnitude = 1
-
         velocities.append([vX, vY])
-
-    # print("\nSeparation")
-    # print(velocities)
 
     return velocities
 
 def alignment():
-    # global boids
-
-    # alignedVelocities = []
-
-    # averageX = 0
-    # averageY = 0
-
-    # for i in range(len(velocities)):
-    #     averageX += velocities[i][0]
-    #     averageY += velocities[i][1]
-
-    # for i in range(len(boids)):
-    #     pX = (averageX - velocities[i][0]) / (len(boids) - 1)
-    #     pY = (averageY - velocities[i][1]) / (len(boids) - 1)
-    #     alignedVelocities.append([pX/8, pY/8])
-
-    # print("\nAlignment")
-    # print(alignedVelocities)
-
-    # return alignedVelocities
-
     global boids
     global perceptionDistance
     global dogfight
@@ -528,13 +458,10 @@ def alignment():
                         pY += otherBoid.headingY
 
         if(neighbours > 0):
-            pX = pX / neighbours #(len(boids) - 1)
-            pY = pY / neighbours #(len(boids) - 1)
+            pX = pX / neighbours 
+            pY = pY / neighbours 
 
         alignedVelocities.append([pX, pY])
-
-    # print("\nAlignment")
-    # print(alignedVelocities)
 
     return alignedVelocities
 
@@ -576,11 +503,7 @@ def draw():
     for bullet in bullets:
         bullet.updatePosition(graph, bulletSize)
 
-    # print("\nPositions")
-    # print(positions)
-
     graph.create_oval(centroidX - boidSize / 2, centroidY - boidSize / 2, centroidX + boidSize / 2, centroidY + boidSize / 2)
-
 
     if(applyWind):
         s = windSpeed.get()
@@ -614,10 +537,6 @@ class Boid:
         if(self.headingY < -boidSpeed):
             self.headingY = -boidSpeed
 
-        # if(headingX != 0 and headingY != 0):
-        #     self.headingX = headingX
-        #     self.headingY = headingY
-
         self.posX += self.headingX
         self.posY += self.headingY
 
@@ -631,30 +550,8 @@ class Boid:
         else:
             heading = math.atan(self.headingY/self.headingX)
 
-        #print("Boid rotation is %s degrees" % (57.2958 * heading))
-
         cosHeading = math.cos(heading)
         sinHeading = math.sin(heading)
-
-        # #Initialize pointing down
-        # point1X = 0
-        # point1Y = -boidSize
-
-        # point2X = boidSize
-        # point2Y = boidSize
-
-        # point3X = -boidSize
-        # point3Y = boidSize
-
-        # #Initialize pointing right
-        # point1X = boidSize
-        # point1Y = 0
-
-        # point2X = -boidSize
-        # point2Y = boidSize
-
-        # point3X = -boidSize
-        # point3Y = -boidSize
 
         #Initialize pointing left
         point1X = -boidSize
@@ -689,8 +586,9 @@ class Boid:
             graph.create_polygon(point1X, point1Y, point2X, point2Y, point3X, point3Y, fill="blue")
         else:
             graph.create_polygon(point1X, point1Y, point2X, point2Y, point3X, point3Y, fill="red")
+
         graph.create_line(point1X, point1Y, point1X + self.headingX, point1Y + self.headingY)
-        #graph.create_polygon(startX, endY, (startX + (endX - startX) / 2, startY, endX, endY), fill="red")
+
 
 class Bullet:
     def __init__(self, posX, posY, headingX, headingY, red):
