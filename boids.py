@@ -5,8 +5,8 @@ import random
 graph = None
 frameGap = 0
 
-WIDTH = 1600
-HEIGHT = 900
+WIDTH = 1800
+HEIGHT = 950
 
 boidSize = 5
 obstacleSize = 20
@@ -15,12 +15,12 @@ bulletSpeed = 2
 shotAccuracy = 0.1
 rateOfFire = 100
 boidNumber = 100
-boidSpeed = min(WIDTH, HEIGHT) / 100
+boidSpeed = int(min(WIDTH, HEIGHT) / 100)
 separationDistance = 20
 obstacleDistance = 70
 perceptionDistance = 50
 lineOfSight = 150
-boundMargin = max(WIDTH, HEIGHT) / 10
+boundMargin = int(max(WIDTH, HEIGHT) / 10)
 boids = []
 obstacles = []
 bullets = []
@@ -524,9 +524,14 @@ class Boid:
         self.framesSinceShot = 0
 
     def updatePosition(self, headingX, headingY, boidSpeed):
-
         self.headingX += headingX
         self.headingY += headingY
+
+        # magnitude = mag(self.headingX, self.headingY)
+
+        # if(magnitude > boidSpeed):
+        #     self.headingX = self.headingX * boidSpeed / magnitude
+        #     self.headingY = self.headingY * boidSpeed / magnitude
 
         if(self.headingX > boidSpeed):
             self.headingX = boidSpeed

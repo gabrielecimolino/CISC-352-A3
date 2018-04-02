@@ -31,7 +31,7 @@ def main():
 def readIt():
     global grid
     global maxGenerations
-    inputFile = open("inLife.txt","r")
+    inputFile = open("inLifePulsar.txt","r")
     firstLine = True
     tempGrid = []
 
@@ -76,8 +76,10 @@ def build_graph():
 def update():
     global generation
     global maxGenerations
+    draw()
+
     if generation < maxGenerations:
-        draw()
+        next_gen()
         graph.after(500, update)
 
 
@@ -85,7 +87,7 @@ def draw():
     global graph
     global m
     global grid
-    next_gen()
+
     newGrid = grid
 
     graph.delete(ALL)
